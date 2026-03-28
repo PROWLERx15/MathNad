@@ -8,6 +8,7 @@ import { generateQuestions, type Question } from '@/lib/questions';
 import Countdown from '@/components/Countdown';
 import QuestionCard from '@/components/QuestionCard';
 import TimerBar from '@/components/TimerBar';
+import { sfx } from '@/lib/sounds';
 
 type GamePhase = 'countdown' | 'playing' | 'submitting' | 'waiting';
 
@@ -78,6 +79,7 @@ export default function BattlePage() {
     if (submittedRef.current) return;
     submittedRef.current = true;
 
+    sfx.gameComplete();
     setPhase('waiting');
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -152,7 +154,7 @@ export default function BattlePage() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background">
+    <div className="relative flex h-screen flex-col bg-background overflow-hidden">
       {/* Countdown Overlay */}
       {phase === 'countdown' && questions.length > 0 && (
         <Countdown onComplete={handleCountdownComplete} />
@@ -167,6 +169,7 @@ export default function BattlePage() {
       {phase === 'playing' && questions[currentQ] && (
         <QuestionCard
           question={questions[currentQ].question}
+          answer={questions[currentQ].answer}
           questionIndex={currentQ}
           totalQuestions={questions.length}
           onAnswer={handleAnswer}
@@ -175,12 +178,14 @@ export default function BattlePage() {
 
       {/* Waiting State */}
       {phase === 'waiting' && (
-        <div className="text-center">
-          <div className="mb-4 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-accent border-t-transparent" />
-          <p className="text-xl text-gray-300">Calculating results...</p>
-          <p className="mt-2 text-sm text-gray-500">
-            Waiting for opponent to finish
-          </p>
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="mb-4 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <p className="text-xl text-gray-300">Calculating results...</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Waiting for opponent to finish
+            </p>
+          </div>
         </div>
       )}
     </div>

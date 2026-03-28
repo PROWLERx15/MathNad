@@ -7,6 +7,7 @@ import { useGameSocket } from '@/lib/wsClient';
 import { createPublicClient, http } from 'viem';
 import { monadTestnet } from '@/config/privy';
 import { CONTRACT_ADDRESS, MATHNAD_ABI } from '@/lib/contract';
+import { sfx } from '@/lib/sounds';
 
 type LobbyState = 'waiting' | 'opponent_joined' | 'seeding' | 'ready';
 
@@ -85,12 +86,14 @@ export default function DuelLobbyPage() {
 
     switch (lastMessage.type) {
       case 'OPPONENT_JOINED':
+        sfx.opponentJoined();
         setLobbyState('seeding');
         break;
       case 'WAITING_SEED':
         setLobbyState('seeding');
         break;
       case 'SEED_READY':
+        sfx.opponentJoined();
         setLobbyState('ready');
         break;
       case 'GAME_START':

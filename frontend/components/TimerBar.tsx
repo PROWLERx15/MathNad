@@ -19,7 +19,7 @@ export default function TimerBar({ duration, elapsed }: TimerBarProps) {
   return (
     <div className="fixed left-0 right-0 top-0 z-40 h-2 bg-surface">
       <div
-        className={`h-full transition-all duration-1000 ease-linear ${color}`}
+        className={`h-full timer-glow transition-all duration-1000 ease-linear ${color}`}
         style={{ width: `${pct}%` }}
       />
       <div className="absolute right-4 top-3 text-xs font-mono text-gray-400">

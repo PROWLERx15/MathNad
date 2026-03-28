@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { sfx } from '@/lib/sounds';
 
 const STAKE_OPTIONS = [
   { label: '0.1 USDC', value: 100_000 },
@@ -90,7 +91,10 @@ export default function StakeModal({
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(selectedStake, selectedDuration)}
+            onClick={() => {
+              sfx.battleCreated();
+              onConfirm(selectedStake, selectedDuration);
+            }}
             disabled={loading}
             className="flex-1 rounded-lg bg-accent py-3 text-sm font-bold text-white transition-all hover:bg-accent/80 disabled:opacity-50"
           >

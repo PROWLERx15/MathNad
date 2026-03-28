@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { sfx } from '@/lib/sounds';
 
 interface CountdownProps {
   onComplete: () => void;
@@ -15,9 +16,11 @@ export default function Countdown({
 
   useEffect(() => {
     if (count <= 0) {
+      sfx.gameStart();
       onComplete();
       return;
     }
+    sfx.countdownTick();
     const timer = setTimeout(() => setCount((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [count, onComplete]);

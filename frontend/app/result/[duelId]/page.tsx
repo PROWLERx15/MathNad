@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePrivyWallet } from '@/hooks/usePrivyWallet';
 import ResultCard from '@/components/ResultCard';
+import { sfx } from '@/lib/sounds';
 
 interface GameResult {
   winner: string;
@@ -20,6 +21,7 @@ export default function ResultPage() {
   const { address } = usePrivyWallet();
 
   const [result, setResult] = useState<GameResult | null>(null);
+  const soundPlayed = useRef(false);
 
   useEffect(() => {
     // Try to get result from sessionStorage (set by battle page)
@@ -32,6 +34,18 @@ export default function ResultPage() {
       }
     }
   }, [duelId]);
+
+  // Play win/lose sound once
+  useEffect(() => {
+    if (!result || soundPlayed.current) return;
+    soundPlayed.current = true;
+    const isWin = address?.toLowerCase() === result.winner.toLowerCase();
+    if (isWin) {
+      sfx.winner();
+    } else {
+      sfx.loser();
+    }
+  }, [result, address]);
 
   if (!result) {
     return (

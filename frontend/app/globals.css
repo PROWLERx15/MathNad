@@ -50,3 +50,8 @@ body {
     width: 0%;
   }
 }
+
+/* Timer glow effect */
+.timer-glow {
+  box-shadow: 0 0 15px rgba(131, 110, 249, 0.4);
+}
