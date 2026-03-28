@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { usePrivyWallet } from '@/hooks/usePrivyWallet';
 import { useMathNadContract } from '@/hooks/useMathNadContract';
 import StakeModal from '@/components/StakeModal';
+import WalletSection from '@/components/WalletSection';
 
 function generateJoinCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -166,6 +167,9 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          {/* Wallet */}
+          <WalletSection />
 
           {/* Error */}
           {error && (
