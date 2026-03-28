@@ -259,17 +259,28 @@ async function handleGameEnd(room: Room) {
 }
 
 function watchForSeed(room: Room) {
+  let pollFailures = 0;
   const pollInterval = setInterval(async () => {
     try {
       const hasSeed = await checkExistingSeed(room);
       if (hasSeed && room.seed) {
         clearInterval(pollInterval);
+        pollFailures = 0;
         console.log(`[Room ${room.duelId}] Seed found via poll: ${room.seed}`);
         broadcast(room, { type: 'SEED_READY', seed: room.seed });
         startCountdownAndGame(room);
+      } else {
+        pollFailures = 0; // reset on successful poll (just no seed yet)
+        console.log(`[Room ${room.duelId}] Polling for seed... (not ready yet)`);
       }
     } catch (err) {
-      console.error('Error polling for seed:', err);
+      pollFailures++;
+      console.error(`[Room ${room.duelId}] Seed poll error (attempt ${pollFailures}):`, err);
+      if (pollFailures >= 10) {
+        clearInterval(pollInterval);
+        console.error(`[Room ${room.duelId}] Giving up on seed after ${pollFailures} failures`);
+        broadcast(room, { type: 'ERROR', message: 'Failed to get game seed. Please try again.' });
+      }
     }
   }, 3000);
 

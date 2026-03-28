@@ -30,19 +30,41 @@ export function useGameSocket() {
   const wsRef = useRef<WebSocket | null>(null);
   const [lastMessage, setLastMessage] = useState<WSMessage | null>(null);
   const [connected, setConnected] = useState(false);
+  const mountedRef = useRef(true);
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
+    // Don't reconnect if unmounted
+    if (!mountedRef.current) return;
+
+    // Close existing connection before creating new one
+    if (wsRef.current) {
+      wsRef.current.onclose = null;
+      wsRef.current.close();
+    }
+
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
     const url = wsUrl
       ? `${wsUrl}/ws`
       : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+
+    console.log('[WS] Connecting to', url);
     const ws = new WebSocket(url);
 
-    ws.onopen = () => setConnected(true);
+    ws.onopen = () => {
+      console.log('[WS] Connected');
+      setConnected(true);
+    };
     ws.onclose = () => {
+      console.log('[WS] Disconnected');
       setConnected(false);
-      // Reconnect after 2s
-      setTimeout(connect, 2000);
+      // Reconnect after 2s only if still mounted
+      if (mountedRef.current) {
+        reconnectTimer.current = setTimeout(connect, 2000);
+      }
+    };
+    ws.onerror = (err) => {
+      console.error('[WS] Error:', err);
     };
     ws.onmessage = (event) => {
       try {
@@ -59,18 +81,32 @@ export function useGameSocket() {
   const send = useCallback((msg: WSMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(msg));
+    } else {
+      console.warn('[WS] Cannot send, not connected');
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    wsRef.current?.close();
-    wsRef.current = null;
+    if (wsRef.current) {
+      wsRef.current.onclose = null;
+      wsRef.current.close();
+      wsRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
+    mountedRef.current = true;
     connect();
     return () => {
-      wsRef.current?.close();
+      mountedRef.current = false;
+      if (reconnectTimer.current) {
+        clearTimeout(reconnectTimer.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.onclose = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
   }, [connect]);
 

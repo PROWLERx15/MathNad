@@ -22,6 +22,7 @@ export default function DuelLobbyPage() {
 
   const [lobbyState, setLobbyState] = useState<LobbyState>('waiting');
   const [duelId, setDuelId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const joinedRef = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,10 +68,9 @@ export default function DuelLobbyPage() {
     };
   }, [code]);
 
-  // Join WS lobby
+  // Join WS lobby (re-joins on reconnection)
   useEffect(() => {
-    if (connected && duelId && address && !joinedRef.current) {
-      joinedRef.current = true;
+    if (connected && duelId && address) {
       send({
         type: 'JOIN_LOBBY',
         duelId,
@@ -99,6 +99,9 @@ export default function DuelLobbyPage() {
         if (duelId) {
           router.push(`/battle/${duelId}`);
         }
+        break;
+      case 'ERROR':
+        setError(lastMessage.message);
         break;
     }
   }, [lastMessage, duelId, router]);
@@ -175,6 +178,10 @@ export default function DuelLobbyPage() {
             </div>
           )}
         </div>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-400">{error}</p>
+        )}
 
         <button
           onClick={() => router.push('/')}

@@ -4,6 +4,16 @@ import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 import { handleConnection } from './gameHandler';
 
+// Validate required env vars at startup
+const required = ['DATABASE_URL', 'CONTRACT_ADDRESS', 'SETTLE_API_URL'];
+for (const key of required) {
+  if (!process.env[key]) {
+    console.error(`FATAL: Missing required env var: ${key}`);
+    process.exit(1);
+  }
+}
+console.log('Env vars OK:', required.map(k => `${k}=${k === 'DATABASE_URL' ? '***' : process.env[k]}`).join(', '));
+
 const port = parseInt(process.env.PORT || '8080', 10);
 
 const server = createServer((_req, res) => {

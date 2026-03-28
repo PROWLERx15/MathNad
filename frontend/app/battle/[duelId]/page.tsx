@@ -38,10 +38,9 @@ export default function BattlePage() {
     phaseRef.current = phase;
   }, [phase]);
 
-  // Join lobby on mount
+  // Join lobby on mount (re-joins on reconnection)
   useEffect(() => {
-    if (connected && address && !joinedRef.current) {
-      joinedRef.current = true;
+    if (connected && address) {
       send({
         type: 'JOIN_LOBBY',
         duelId,
