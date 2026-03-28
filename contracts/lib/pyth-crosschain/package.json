@@ -1,0 +1,24 @@
+{
+  "devDependencies": {
+    "@better-builds/ts-duality": "catalog:",
+    "@biomejs/biome": "catalog:",
+    "@cprussin/tsconfig": "catalog:",
+    "@pythnetwork/create-pyth-package": "workspace:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": "^24.0.0",
+    "pnpm": ">=10.28.0"
+  },
+  "name": "@pythnetwork/pyth-crosschain",
+  "packageManager": "pnpm@10.28.0",
+  "private": true,
+  "scripts": {
+    "fix:lint": "./scripts/biome-ci --write",
+    "fix:lint:unsafe": "./scripts/biome-ci --write --unsafe",
+    "install:modules": "[ $CI ] && true || pnpm install",
+    "test:lint": "./scripts/biome-ci",
+    "turbo": "[ ! -d node_modules ] && pnpm install; turbo"
+  }
+}

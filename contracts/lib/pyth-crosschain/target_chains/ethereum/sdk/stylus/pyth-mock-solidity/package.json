@@ -1,0 +1,23 @@
+{
+  "author": "",
+  "dependencies": {
+    "@pythnetwork/pyth-sdk-solidity": "^4.0.0"
+  },
+  "description": "** Deploy mock solidity pyth contract using the pyth solidity sdk **",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "keywords": [],
+  "license": "ISC",
+  "name": "pyth-mock-solidity",
+  "scripts": {},
+  "type": "module",
+  "version": "1.1.0"
+}

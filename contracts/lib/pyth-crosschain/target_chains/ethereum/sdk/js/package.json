@@ -1,0 +1,117 @@
+{
+  "author": {
+    "name": "Pyth Data Association"
+  },
+  "dependencies": {
+    "@pythnetwork/hermes-client": "workspace:*",
+    "viem": "catalog:"
+  },
+  "description": "Pyth Network EVM Utils in JS",
+  "devDependencies": {
+    "@pythnetwork/jest-config": "workspace:",
+    "@pythnetwork/pyth-sdk-solidity": "workspace:*",
+    "@truffle/hdwallet-provider": "^2.1.5",
+    "@types/ethereum-protocol": "^1.0.2",
+    "@types/jest": "^29.4.0",
+    "@types/node": "^18.11.18",
+    "@types/web3-provider-engine": "^14.0.1",
+    "@types/yargs": "^17.0.10",
+    "jest": "^29.4.1",
+    "ts-jest": "^29.0.5"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/esm/index.mjs",
+        "types": "./dist/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/index.cjs",
+        "types": "./dist/cjs/index.d.ts"
+      }
+    },
+    "./filler": {
+      "import": {
+        "default": "./dist/esm/filler.mjs",
+        "types": "./dist/esm/filler.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/filler.cjs",
+        "types": "./dist/cjs/filler.d.ts"
+      }
+    },
+    "./multicall3-bundler": {
+      "import": {
+        "default": "./dist/esm/multicall3-bundler.mjs",
+        "types": "./dist/esm/multicall3-bundler.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/multicall3-bundler.cjs",
+        "types": "./dist/cjs/multicall3-bundler.d.ts"
+      }
+    },
+    "./package.json": "./package.json",
+    "./pyth-abi": {
+      "import": {
+        "default": "./dist/esm/pyth-abi.mjs",
+        "types": "./dist/esm/pyth-abi.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/pyth-abi.cjs",
+        "types": "./dist/cjs/pyth-abi.d.ts"
+      }
+    },
+    "./tracer/debug-trace-call": {
+      "import": {
+        "default": "./dist/esm/tracer/debug-trace-call.mjs",
+        "types": "./dist/esm/tracer/debug-trace-call.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/tracer/debug-trace-call.cjs",
+        "types": "./dist/cjs/tracer/debug-trace-call.d.ts"
+      }
+    },
+    "./tracer/trace-call-many": {
+      "import": {
+        "default": "./dist/esm/tracer/trace-call-many.mjs",
+        "types": "./dist/esm/tracer/trace-call-many.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/tracer/trace-call-many.cjs",
+        "types": "./dist/cjs/tracer/trace-call-many.d.ts"
+      }
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "homepage": "https://pyth.network",
+  "keywords": [
+    "pyth",
+    "oracle"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.mjs",
+  "name": "@pythnetwork/pyth-evm-js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "target_chains/ethereum/sdk/js",
+    "type": "git",
+    "url": "https://github.com/pyth-network/pyth-crosschain"
+  },
+  "scripts": {
+    "build": "ts-duality",
+    "clean": "rm -rf ./dist",
+    "prepublishOnly": "pnpm run build",
+    "version": "pnpm run test:format && git add -A src"
+  },
+  "type": "module",
+  "types": "./dist/cjs/index.d.ts",
+  "version": "2.0.0"
+}

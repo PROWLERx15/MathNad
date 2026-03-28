@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Stats (denormalized for fast leaderboard queries)
+  totalWins   Int @default(0) @map("total_wins")
+  totalLosses Int @default(0) @map("total_losses")
+  totalDraws  Int @default(0) @map("total_draws")
+  totalEarned BigInt @default(0) @map("total_earned") // in USDC smallest unit
+  totalStaked BigInt @default(0) @map("total_staked")
+  winStreak   Int @default(0) @map("win_streak")
+  bestStreak  Int @default(0) @map("best_streak")
+  avgScore    Float @default(0) @map("avg_score")
+
+  duelsAsPlayer1  Duel[]           @relation("Player1")
+  duelsAsPlayer2  Duel[]           @relation("Player2")
+  duelsWon        Duel[]           @relation("Winner")
+  submissions     GameSubmission[]
+
+  @@map("players")
+}
+
+model Duel {
+  id        String   @id @default(cuid())
+  duelId    Int?     @unique @map("duel_id") // on-chain duel ID
+  joinCode  String   @unique @map("join_code")
+  stake     BigInt   // USDC amount in smallest unit
+  duration  Int      // 30 or 60 seconds
+  status    DuelStatus @default(WAITING)
+  seed      String?  // on-chain random seed
+  txHash    String?  @map("tx_hash")
+
+  player1Address String  @map("player1_address")
+  player2Address String? @map("player2_address")
+  winnerAddress  String? @map("winner_address")
+
+  player1 Player  @relation("Player1", fields: [player1Address], references: [address])
+  player2 Player? @relation("Player2", fields: [player2Address], references: [address])
+  winner  Player? @relation("Winner", fields: [winnerAddress], references: [address])
+
+  winnerScore  Int? @map("winner_score")
+  loserScore   Int? @map("loser_score")
+
+  submissions GameSubmission[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  settledAt DateTime? @map("settled_at")
+
+  @@index([status])
+  @@index([player1Address])
+  @@index([player2Address])
+  @@index([createdAt])
+  @@map("duels")
+}
+
+model GameSubmission {
+  id        String @id @default(cuid())
+
+  duelId    String @map("duel_db_id")
+  duel      Duel   @relation(fields: [duelId], references: [id])
+
+  playerAddress String @map("player_address")
+  player        Player @relation(fields: [playerAddress], references: [address])
+
+  answers   Int[]
+  score     Int
+  totalTime Int    @map("total_time") // milliseconds
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([duelId, playerAddress])
+  @@map("game_submissions")
+}
+
+enum DuelStatus {
+  WAITING   // player1 created, waiting for player2
+  SEEDING   // player2 joined, waiting for VRF seed
+  ACTIVE    // seed ready, game in progress
+  COMPLETED // game finished, settlement pending
+  SETTLED   // on-chain settlement done
+  CANCELLED // duel cancelled
+}

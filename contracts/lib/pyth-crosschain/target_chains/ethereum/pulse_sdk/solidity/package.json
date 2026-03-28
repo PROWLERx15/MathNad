@@ -1,0 +1,42 @@
+{
+  "author": "Douro Labs",
+  "bugs": {
+    "url": "https://github.com/pyth-network/pyth-crosschain/issues"
+  },
+  "dependencies": {
+    "@pythnetwork/pyth-sdk-solidity": "workspace:*"
+  },
+  "description": "Automatically update price feeds with Pyth Pulse",
+  "devDependencies": {
+    "abi_generator": "workspace:*"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "homepage": "https://github.com/pyth-network/pyth-crosschain/tree/main/target_chains/ethereum/pulse_sdk/solidity",
+  "keywords": [
+    "pyth",
+    "solidity",
+    "price feed",
+    "pulse"
+  ],
+  "license": "Apache-2.0",
+  "name": "@pythnetwork/pulse-sdk-solidity",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "target_chains/ethereum/pulse_sdk/solidity",
+    "type": "git",
+    "url": "https://github.com/pyth-network/pyth-crosschain"
+  },
+  "scripts": {
+    "build": "generate-abis IScheduler SchedulerConstants SchedulerErrors SchedulerEvents SchedulerStructs",
+    "test": "git diff --exit-code abis"
+  },
+  "type": "module",
+  "version": "1.1.0"
+}

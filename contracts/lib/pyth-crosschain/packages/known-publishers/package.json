@@ -1,0 +1,41 @@
+{
+  "devDependencies": {
+    "@cprussin/tsconfig": "catalog:",
+    "@pythnetwork/jest-config": "workspace:",
+    "@types/jest": "catalog:",
+    "@types/react": "catalog:",
+    "jest": "catalog:",
+    "react": "catalog:"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/esm/index.mjs",
+        "types": "./dist/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/index.cjs",
+        "types": "./dist/cjs/index.d.ts"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.mjs",
+  "name": "@pythnetwork/known-publishers",
+  "peerDependencies": {
+    "react": "catalog:"
+  },
+  "private": true,
+  "scripts": {
+    "build": "ts-duality",
+    "clean": "rm -rf dist/",
+    "test:types": "tsc"
+  },
+  "type": "module",
+  "types": "./dist/cjs/index.d.ts",
+  "version": "0.1.0"
+}

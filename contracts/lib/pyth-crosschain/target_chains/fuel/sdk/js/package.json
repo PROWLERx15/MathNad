@@ -1,0 +1,102 @@
+{
+  "author": {
+    "name": "Pyth Data Association"
+  },
+  "dependencies": {
+    "fuels": "catalog:"
+  },
+  "description": "Pyth Network Fuel Utils in JS",
+  "devDependencies": {
+    "@pythnetwork/hermes-client": "workspace:*",
+    "@types/node": "catalog:",
+    "copyfiles": "^2.4.1",
+    "ts-node": "catalog:"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/esm/index.mjs",
+        "types": "./dist/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/index.cjs",
+        "types": "./dist/cjs/index.d.ts"
+      }
+    },
+    "./package.json": "./package.json",
+    "./types": {
+      "import": {
+        "default": "./dist/esm/types/index.mjs",
+        "types": "./dist/esm/types/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/types/index.cjs",
+        "types": "./dist/cjs/types/index.d.ts"
+      }
+    },
+    "./types/common": {
+      "import": {
+        "default": "./dist/esm/types/common.mjs",
+        "types": "./dist/esm/types/common.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/types/common.cjs",
+        "types": "./dist/cjs/types/common.d.ts"
+      }
+    },
+    "./types/PythContract": {
+      "import": {
+        "default": "./dist/esm/types/PythContract.mjs",
+        "types": "./dist/esm/types/PythContract.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/types/PythContract.cjs",
+        "types": "./dist/cjs/types/PythContract.d.ts"
+      }
+    },
+    "./types/PythContractFactory": {
+      "import": {
+        "default": "./dist/esm/types/PythContractFactory.mjs",
+        "types": "./dist/esm/types/PythContractFactory.d.ts"
+      },
+      "require": {
+        "default": "./dist/cjs/types/PythContractFactory.cjs",
+        "types": "./dist/cjs/types/PythContractFactory.d.ts"
+      }
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "homepage": "https://pyth.network",
+  "keywords": [
+    "pyth",
+    "oracle"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.mjs",
+  "name": "@pythnetwork/pyth-fuel-js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "target_chains/fuel/sdk/js",
+    "type": "git",
+    "url": "https://github.com/pyth-network/pyth-crosschain"
+  },
+  "scripts": {
+    "build": "pnpm run generate-fuel-types && ts-duality --copyOtherFiles",
+    "clean": "rm -rf ./dist",
+    "generate-fuel-types": "pnpm fuels typegen -i ../../contracts/pyth-contract/out/release/*-abi.json -o ./src/types && pnpm biome check --write --unsafe ./src",
+    "prepublishOnly": "pnpm run build",
+    "usage-example": "ts-node src/examples/usage.ts",
+    "version": "git add -A src"
+  },
+  "type": "module",
+  "types": "./dist/cjs/index.d.ts",
+  "version": "1.1.0"
+}

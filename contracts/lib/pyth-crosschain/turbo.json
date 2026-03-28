@@ -1,0 +1,135 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NODE_ENV"],
+  "globalPassThroughEnv": ["COREPACK_HOME", "FORCE_COLOR", "BIOME_BINARY"],
+  "tasks": {
+    "//#fix": {
+      "cache": false,
+      "dependsOn": ["//#fix:lint", "//#fix:format"]
+    },
+    "//#fix:format": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "//#fix:lint"]
+    },
+    "//#fix:lint": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "//#install:modules": {
+      "inputs": [
+        "**/package.json",
+        ".npmrc",
+        ".npmignore",
+        "pnpm-workspace.yaml",
+        "!**/.next/**",
+        "!**/dist/**"
+      ],
+      "outputs": ["pnpm-lock.yaml"]
+    },
+    "//#test": {
+      "dependsOn": [
+        "//#test:types",
+        "//#test:unit",
+        "//#test:integration",
+        "//#test:format",
+        "//#test:lint"
+      ]
+    },
+    "//#test:format": {
+      "dependsOn": ["//#install:modules"]
+    },
+    "//#test:integration": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "//#test:lint": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "//#test:types": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "//#test:unit": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "build": {
+      "dependsOn": ["//#install:modules", "pull:env", "clean", "^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!README.md",
+        "!**/*.test.*",
+        "!jest.config.js",
+        "!eslint.config.js",
+        "!vercel.json"
+      ],
+      "outputs": ["lib/**", "dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "build:vercel": {
+      "dependsOn": ["//#install:modules", "pull:env", "^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!README.md",
+        "!**/*.test.*",
+        "!jest.config.js",
+        "!eslint.config.js",
+        "!vercel.json"
+      ],
+      "outputs": ["lib/**", "dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "clean": {
+      "cache": false,
+      "outputs": []
+    },
+    "fix": {
+      "cache": false,
+      "dependsOn": ["fix:lint", "fix:format"]
+    },
+    "fix:format": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "fix:lint"]
+    },
+    "fix:lint": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "pull:env": {
+      "cache": false,
+      "dependsOn": ["//#install:modules"],
+      "outputs": [".env.local"]
+    },
+    "start:dev": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "pull:env", "^build"],
+      "persistent": true
+    },
+    "start:prod": {
+      "cache": false,
+      "dependsOn": ["//#install:modules", "build"],
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": [
+        "//#test:lint",
+        "test:types",
+        "test:unit",
+        "test:integration",
+        "test:format",
+        "test:lint"
+      ]
+    },
+    "test:format": {
+      "dependsOn": ["//#install:modules"]
+    },
+    "test:integration": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "test:lint": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "test:types": {
+      "dependsOn": ["//#install:modules", "^build"]
+    },
+    "test:unit": {
+      "dependsOn": ["//#install:modules", "^build"]
+    }
+  },
+  "ui": "tui"
+}

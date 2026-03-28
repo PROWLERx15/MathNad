@@ -1,0 +1,35 @@
+{
+  "author": "Douro Labs",
+  "bugs": {
+    "url": "https://github.com/pyth-network/pyth-crosschain/issues"
+  },
+  "description": "Generate secure random numbers with Pyth Entropy",
+  "devDependencies": {
+    "abi_generator": "workspace:*"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  },
+  "homepage": "https://github.com/pyth-network/pyth-crosschain/tree/main/target_chains/ethereum/entropy_sdk/solidity",
+  "keywords": [
+    "pyth",
+    "solidity",
+    "random"
+  ],
+  "license": "Apache-2.0",
+  "name": "@pythnetwork/entropy-sdk-solidity",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "target_chains/ethereum/entropy_sdk/solidity",
+    "type": "git",
+    "url": "https://github.com/pyth-network/pyth-crosschain"
+  },
+  "scripts": {
+    "build": "generate-abis IEntropy IEntropyV2 IEntropyConsumer EntropyErrors EntropyEvents EntropyEventsV2 EntropyStructs EntropyStructsV2 EntropyStatusConstants PRNG",
+    "test": "git diff --exit-code abis"
+  },
+  "type": "module",
+  "version": "2.2.1"
+}

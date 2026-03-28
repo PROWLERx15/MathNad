@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+frontend/.next/
+frontend/out/
+
+# PWA generated files
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/workbox-*.js
+frontend/public/workbox-*.js.map
+frontend/public/worker-*.js
+frontend/public/worker-*.js.map
+
+# Prisma generated client
+frontend/lib/generated/
+
+# Local SSL certs
+frontend/certs/
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+.agents/
+skills-lock.json

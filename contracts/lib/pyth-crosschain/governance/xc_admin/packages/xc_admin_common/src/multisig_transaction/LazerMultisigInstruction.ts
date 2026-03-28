@@ -1,0 +1,52 @@
+import type { Idl } from "@coral-xyz/anchor";
+import { BorshInstructionCoder } from "@coral-xyz/anchor";
+import type { TransactionInstruction } from "@solana/web3.js";
+import type { AnchorAccounts } from "./anchor";
+import { resolveAccountNames } from "./anchor";
+import lazerIdl from "./idl/lazer.json";
+import type { MultisigInstruction } from "./index";
+import { MultisigInstructionProgram, UNRECOGNIZED_INSTRUCTION } from "./index";
+
+export class LazerMultisigInstruction implements MultisigInstruction {
+  readonly program = MultisigInstructionProgram.Lazer;
+  readonly name: string;
+  // biome-ignore lint/suspicious/noExplicitAny: legacy typing
+  readonly args: { [key: string]: any };
+  readonly accounts: AnchorAccounts;
+
+  constructor(
+    name: string,
+    // biome-ignore lint/suspicious/noExplicitAny: legacy typing
+    args: { [key: string]: any },
+    accounts: AnchorAccounts,
+  ) {
+    this.name = name;
+    this.args = args;
+    this.accounts = accounts;
+  }
+
+  static fromInstruction(
+    instruction: TransactionInstruction,
+  ): LazerMultisigInstruction {
+    // TODO: This is a hack to transform the IDL to be compatible with the anchor version we are using, we can't upgrade anchor to 0.30.1 because then the existing idls will break
+    const idl = lazerIdl as Idl;
+
+    const coder = new BorshInstructionCoder(idl);
+
+    const deserializedData = coder.decode(instruction.data);
+
+    if (deserializedData) {
+      return new LazerMultisigInstruction(
+        deserializedData.name,
+        deserializedData.data,
+        resolveAccountNames(idl, deserializedData.name, instruction),
+      );
+    } else {
+      return new LazerMultisigInstruction(
+        UNRECOGNIZED_INSTRUCTION,
+        { data: instruction.data },
+        { named: {}, remaining: instruction.keys },
+      );
+    }
+  }
+}
