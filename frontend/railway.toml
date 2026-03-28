@@ -1,6 +1,5 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "npm run build && npx tsc --project tsconfig.server.json && npx prisma generate"
+buildCommand = "npx prisma generate && npm run build && npx tsc --project tsconfig.server.json"
 
 [deploy]
 startCommand = "npx prisma migrate deploy && node dist/server.js"
