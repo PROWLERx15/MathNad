@@ -1,8 +1,5 @@
-[build]
-buildCommand = "npx prisma generate && npm run build && npx tsc --project tsconfig.server.json"
-
 [deploy]
-startCommand = "npx prisma migrate deploy && node dist/server.js"
+startCommand = "npx prisma migrate deploy && npm start"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
