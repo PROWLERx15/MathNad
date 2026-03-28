@@ -1,3 +1,6 @@
+[build]
+installCommand = "npm install"
+
 [deploy]
 startCommand = "npx prisma migrate deploy && npm start"
 healthcheckPath = "/"
