@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: mathnad-ws
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: CONTRACT_ADDRESS
+        sync: false
+      - key: MONAD_RPC
+        sync: false
+      - key: SETTLE_API_URL
+        sync: false

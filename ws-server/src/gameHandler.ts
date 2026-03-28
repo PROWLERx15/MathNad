@@ -1,28 +1,23 @@
 import { WebSocket } from 'ws';
 import { createPublicClient, http, type Log } from 'viem';
-import { generateQuestions } from '../lib/questions';
+import { generateQuestions } from './questions';
 import { PrismaClient } from '@prisma/client';
-
-// Allow self-signed certs for internal API calls in dev
-if (process.env.NODE_ENV !== 'production') {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-}
 
 const prisma = new PrismaClient();
 
-// Chain config (inline to avoid importing from client module)
 const monadTestnet = {
   id: 10143,
   name: 'Monad Testnet',
   nativeCurrency: { decimals: 18, name: 'MONAD', symbol: 'MON' },
   rpcUrls: {
     default: {
-      http: [process.env.NEXT_PUBLIC_MONAD_RPC || 'https://testnet-rpc.monad.xyz'],
+      http: [process.env.MONAD_RPC || 'https://testnet-rpc.monad.xyz'],
     },
   },
 } as const;
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS as `0x${string}`;
+const SETTLE_API_URL = process.env.SETTLE_API_URL!; // e.g. https://mathnad.vercel.app/api/settle
 
 const SEED_FULFILLED_EVENT = {
   name: 'DuelSeedFulfilled',
@@ -40,8 +35,8 @@ interface Submission {
 }
 
 interface Room {
-  duelId: string; // on-chain duel ID
-  dbId: string;   // prisma duel ID
+  duelId: string;
+  dbId: string;
   joinCode: string;
   players: Map<string, WebSocket>;
   duration: number;
@@ -50,7 +45,7 @@ interface Room {
   serverTimer?: ReturnType<typeof setTimeout>;
   vrfWatcher?: () => void;
   disconnectTimers: Map<string, ReturnType<typeof setTimeout>>;
-  settling: boolean; // prevents double settlement
+  settling: boolean;
   gameStarted: boolean;
 }
 
@@ -77,37 +72,33 @@ function sendTo(ws: WebSocket, msg: object) {
 }
 
 async function startCountdownAndGame(room: Room) {
-  // Prevent double start
   if (room.gameStarted) return;
   room.gameStarted = true;
 
-  // Update DB status to ACTIVE
-  await prisma.duel.update({
-    where: { id: room.dbId },
-    data: { status: 'ACTIVE', seed: room.seed },
-  }).catch((err: Error) => console.error('DB update to ACTIVE failed:', err));
+  await prisma.duel
+    .update({
+      where: { id: room.dbId },
+      data: { status: 'ACTIVE', seed: room.seed },
+    })
+    .catch((err: Error) => console.error('DB update to ACTIVE failed:', err));
 
-  // 3-2-1 countdown
   for (let n = 3; n >= 1; n--) {
     broadcast(room, { type: 'TICK', n });
     await new Promise((r) => setTimeout(r, 1000));
   }
 
-  // Start game
   broadcast(room, {
     type: 'GAME_START',
     seed: room.seed,
     duration: room.duration,
   });
 
-  // Server-side timer for game end
   room.serverTimer = setTimeout(() => {
     handleGameEnd(room);
-  }, room.duration * 1000 + 5000); // +5s grace for network latency
+  }, room.duration * 1000 + 5000);
 }
 
 async function handleGameEnd(room: Room) {
-  // Prevent double settlement (race condition guard)
   if (room.settling) return;
   room.settling = true;
 
@@ -132,7 +123,6 @@ async function handleGameEnd(room: Room) {
   const questions = generateQuestions(BigInt(room.seed), 10);
   const playerAddrs = Array.from(room.players.keys());
 
-  // Score submissions server-side
   for (const [addr, sub] of room.submissions.entries()) {
     let score = 0;
     for (let i = 0; i < Math.min(sub.answers.length, questions.length); i++) {
@@ -141,13 +131,14 @@ async function handleGameEnd(room: Room) {
       }
     }
     sub.score = score;
-    console.log(`[Room ${room.duelId}] Player ${addr}: answers=${JSON.stringify(sub.answers)}, score=${score}, time=${sub.totalTime}ms`);
+    console.log(
+      `[Room ${room.duelId}] Player ${addr}: answers=${JSON.stringify(sub.answers)}, score=${score}, time=${sub.totalTime}ms`,
+    );
   }
 
   // Log expected vs actual questions for debugging
   console.log(`[Room ${room.duelId}] Expected answers: ${JSON.stringify(questions.map(q => q.answer))}`);
 
-  // Determine winner
   let winner: string;
   let loser: string;
   let winnerScore: number;
@@ -198,7 +189,7 @@ async function handleGameEnd(room: Room) {
 
   console.log(`[Room ${room.duelId}] Winner: ${winner} (score=${winnerScore}), Loser: ${loser} (score=${loserScore})`);
 
-  // Save game submissions to DB
+  // Save submissions to DB
   try {
     for (const [addr, sub] of room.submissions.entries()) {
       await prisma.gameSubmission.upsert({
@@ -223,7 +214,6 @@ async function handleGameEnd(room: Room) {
       });
     }
 
-    // Mark duel as COMPLETED before settlement
     await prisma.duel.update({
       where: { id: room.dbId },
       data: {
@@ -236,12 +226,10 @@ async function handleGameEnd(room: Room) {
     console.error('DB submission save failed:', err);
   }
 
-  // Call /api/settle to settle on-chain
+  // Call the Vercel-hosted settle API
   let txHash = '';
   try {
-    const port = process.env.PORT || '3000';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${port}`;
-    const res = await fetch(`${baseUrl}/api/settle`, {
+    const res = await fetch(SETTLE_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -267,13 +255,10 @@ async function handleGameEnd(room: Room) {
     txHash,
   });
 
-  // Cleanup room
   rooms.delete(room.duelId);
 }
 
 function watchForSeed(room: Room) {
-  // Poll the contract every 3s for seed fulfillment
-  // This is more reliable than watchContractEvent which can miss already-emitted events
   const pollInterval = setInterval(async () => {
     try {
       const hasSeed = await checkExistingSeed(room);
@@ -288,7 +273,6 @@ function watchForSeed(room: Room) {
     }
   }, 3000);
 
-  // Also try event-based watching as a faster path
   try {
     const unwatch = publicClient.watchContractEvent({
       address: CONTRACT_ADDRESS,
@@ -305,7 +289,9 @@ function watchForSeed(room: Room) {
               room.vrfWatcher();
               room.vrfWatcher = undefined;
             }
-            console.log(`[Room ${room.duelId}] Seed found via event: ${room.seed}`);
+            console.log(
+              `[Room ${room.duelId}] Seed found via event: ${room.seed}`,
+            );
             broadcast(room, { type: 'SEED_READY', seed: room.seed });
             startCountdownAndGame(room);
           }
@@ -318,7 +304,6 @@ function watchForSeed(room: Room) {
     };
   } catch (err) {
     console.error('Error watching for seed event (poll still active):', err);
-    // Poll is still running as fallback
     room.vrfWatcher = () => clearInterval(pollInterval);
   }
 }
@@ -380,26 +365,25 @@ export function handleConnection(ws: WebSocket) {
           const { duelId, playerAddress: addr } = msg;
           playerAddress = addr.toLowerCase();
 
-          // Look up duel in DB to get dbId and joinCode
           let dbDuel = await prisma.duel.findFirst({
             where: { duelId: Number(duelId) },
           });
 
-          // If not found by on-chain ID, try by joinCode (player1 may not have on-chain ID yet)
           if (!dbDuel) {
             dbDuel = await prisma.duel.findFirst({
               where: {
                 OR: [
-                  { joinCode: duelId }, // duelId might be joinCode for player1
-                  { duelId: isNaN(Number(duelId)) ? undefined : Number(duelId) },
+                  { joinCode: duelId },
+                  {
+                    duelId: isNaN(Number(duelId)) ? undefined : Number(duelId),
+                  },
                 ],
               },
             });
           }
 
-          const roomKey = duelId; // use on-chain duelId as room key
+          const roomKey = duelId;
 
-          // Get or create room
           if (!rooms.has(roomKey)) {
             rooms.set(roomKey, {
               duelId: duelId,
@@ -416,14 +400,12 @@ export function handleConnection(ws: WebSocket) {
 
           const room = rooms.get(roomKey)!;
 
-          // Update dbId if we now have it
           if (dbDuel?.id && !room.dbId) {
             room.dbId = dbDuel.id;
           }
 
           currentRoom = room;
 
-          // Clear disconnect timer if reconnecting
           const existingTimer = room.disconnectTimers.get(playerAddress!);
           if (existingTimer) {
             clearTimeout(existingTimer);
@@ -432,16 +414,16 @@ export function handleConnection(ws: WebSocket) {
 
           room.players.set(playerAddress!, ws);
 
-          // Tell the player the current state
           if (room.players.size === 1) {
             sendTo(ws, { type: 'LOBBY_JOINED', waiting: true });
           }
 
-          // If 2 players are in the room
           if (room.players.size === 2 && !room.gameStarted) {
-            broadcast(room, { type: 'OPPONENT_JOINED', player2: playerAddress });
+            broadcast(room, {
+              type: 'OPPONENT_JOINED',
+              player2: playerAddress,
+            });
 
-            // Check if seed already exists
             const hasSeed = await checkExistingSeed(room);
             if (hasSeed) {
               broadcast(room, { type: 'SEED_READY', seed: room.seed! });
@@ -451,7 +433,6 @@ export function handleConnection(ws: WebSocket) {
               watchForSeed(room);
             }
           } else if (room.gameStarted && room.seed) {
-            // Player reconnecting mid-game — send them the game state
             sendTo(ws, {
               type: 'GAME_START',
               seed: room.seed,
@@ -467,11 +448,13 @@ export function handleConnection(ws: WebSocket) {
           if (!room) return;
 
           const normalizedAddr = addr.toLowerCase();
-
-          // Prevent duplicate submissions (race condition guard)
           if (room.submissions.has(normalizedAddr)) return;
 
-          room.submissions.set(normalizedAddr, { answers, totalTime, score: 0 });
+          room.submissions.set(normalizedAddr, {
+            answers,
+            totalTime,
+            score: 0,
+          });
 
           // Only trigger game end if not already settling
           if (!room.settling && room.submissions.size >= room.players.size) {
@@ -488,13 +471,15 @@ export function handleConnection(ws: WebSocket) {
   ws.on('close', () => {
     if (!currentRoom || !playerAddress) return;
 
-    // 10-second forfeit timer
     const timer = setTimeout(() => {
       if (currentRoom && currentRoom.players.has(playerAddress!)) {
         currentRoom.players.delete(playerAddress!);
 
-        // If game was in progress and not already settling
-        if (currentRoom.seed && currentRoom.serverTimer && !currentRoom.settling) {
+        if (
+          currentRoom.seed &&
+          currentRoom.serverTimer &&
+          !currentRoom.settling
+        ) {
           handleGameEnd(currentRoom);
         }
       }

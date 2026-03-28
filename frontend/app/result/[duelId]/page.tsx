@@ -74,7 +74,6 @@ export default function ResultPage() {
       totalQuestions={10}
       payout={isWinner ? payoutDisplay : undefined}
       txHash={result.txHash}
-      onRematch={() => router.push('/')}
       onGoHome={() => router.push('/')}
     />
   );

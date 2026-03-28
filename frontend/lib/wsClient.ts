@@ -32,8 +32,11 @@ export function useGameSocket() {
   const [connected, setConnected] = useState(false);
 
   const connect = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    const url = wsUrl
+      ? `${wsUrl}/ws`
+      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+    const ws = new WebSocket(url);
 
     ws.onopen = () => setConnected(true);
     ws.onclose = () => {

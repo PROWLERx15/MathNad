@@ -7,7 +7,6 @@ interface ResultCardProps {
   totalQuestions: number;
   payout?: string;
   txHash?: string;
-  onRematch: () => void;
   onGoHome: () => void;
 }
 
@@ -18,7 +17,6 @@ export default function ResultCard({
   totalQuestions,
   payout,
   txHash,
-  onRematch,
   onGoHome,
 }: ResultCardProps) {
   return (
@@ -66,18 +64,12 @@ export default function ResultCard({
         )}
 
         {/* Actions */}
-        <div className="mt-5 flex gap-3">
+        <div className="mt-5">
           <button
             onClick={onGoHome}
-            className="flex-1 rounded-xl border border-gray-700 py-3 text-sm text-gray-400 transition-colors active:bg-gray-800"
+            className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white transition-all active:scale-95"
           >
             Go Home
-          </button>
-          <button
-            onClick={onRematch}
-            className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white transition-all active:scale-95"
-          >
-            Rematch
           </button>
         </div>
       </div>

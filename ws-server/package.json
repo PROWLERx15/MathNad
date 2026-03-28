@@ -1,0 +1,26 @@
+{
+  "name": "mathnad-ws-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node --project tsconfig.json src/index.ts",
+    "build": "npx prisma generate && tsc",
+    "start": "node dist/src/index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.2",
+    "dotenv": "^17.3.1",
+    "prisma": "^6.19.2",
+    "viem": "^2.21.0",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/ws": "^8.5.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5"
+  }
+}
