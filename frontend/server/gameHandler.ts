@@ -216,7 +216,8 @@ async function handleGameEnd(room: Room) {
   // Call /api/settle to settle on-chain
   let txHash = '';
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const port = process.env.PORT || '3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${port}`;
     const res = await fetch(`${baseUrl}/api/settle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

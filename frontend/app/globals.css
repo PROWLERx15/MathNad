@@ -6,24 +6,79 @@
   --background: #0a0a0f;
   --foreground: #ffffff;
   --accent: #836ef9;
+  /* Safe area insets for notched devices */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* Reset & PWA base styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  /* Prevent overscroll bounce on iOS PWA */
+  overscroll-behavior: none;
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'JetBrains Mono', monospace;
+  /* Prevent pull-to-refresh in PWA */
+  overscroll-behavior-y: contain;
+  /* Full viewport height including safe areas */
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Prevent text selection on game elements */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Safe area padding */
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+}
+
+/* Allow text selection on inputs */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Use dvh for full-screen layouts (respects mobile browser chrome) */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--accent);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 /* Pulse animation for waiting states */
@@ -54,4 +109,24 @@ body {
 /* Timer glow effect */
 .timer-glow {
   box-shadow: 0 0 15px rgba(131, 110, 249, 0.4);
+}
+
+/* PWA standalone mode adjustments */
+@media all and (display-mode: standalone) {
+  body {
+    /* Extra top padding in standalone mode for status bar */
+    padding-top: max(var(--sat), 20px);
+  }
+}
+
+/* Disable hover effects on touch devices for snappier interactions */
+@media (hover: none) {
+  button:hover {
+    transform: none !important;
+  }
+}
+
+/* Active state feedback for mobile */
+button:active {
+  transform: scale(0.97);
 }

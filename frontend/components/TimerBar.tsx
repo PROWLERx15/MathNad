@@ -17,12 +17,14 @@ export default function TimerBar({ duration, elapsed }: TimerBarProps) {
         : 'bg-red-500';
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-40 h-2 bg-surface">
-      <div
-        className={`h-full timer-glow transition-all duration-1000 ease-linear ${color}`}
-        style={{ width: `${pct}%` }}
-      />
-      <div className="absolute right-4 top-3 text-xs font-mono text-gray-400">
+    <div className="fixed left-0 right-0 top-0 z-40 bg-surface" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="h-1.5 bg-surface">
+        <div
+          className={`h-full timer-glow transition-all duration-1000 ease-linear ${color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="absolute right-4 top-full mt-1 text-[10px] font-mono text-gray-400">
         {remaining}s
       </div>
     </div>

@@ -154,7 +154,7 @@ export default function BattlePage() {
   }
 
   return (
-    <div className="relative flex h-screen flex-col bg-background overflow-hidden">
+    <div className="relative flex h-screen flex-col bg-background overflow-hidden select-none">
       {/* Countdown Overlay */}
       {phase === 'countdown' && questions.length > 0 && (
         <Countdown onComplete={handleCountdownComplete} />

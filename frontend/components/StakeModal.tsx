@@ -35,24 +35,24 @@ export default function StakeModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-accent/30 bg-surface p-6 shadow-2xl">
-        <h2 className="mb-6 text-center text-xl font-bold text-white">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center">
+      <div className="w-full max-w-sm rounded-t-3xl border-t border-accent/30 bg-surface p-6 pb-10 shadow-2xl sm:rounded-2xl sm:border sm:pb-6">
+        <h2 className="mb-5 text-center text-lg font-bold text-white">
           Battle Settings
         </h2>
 
         {/* Stake Selection */}
-        <div className="mb-6">
-          <p className="mb-3 text-sm text-gray-400">Stake Amount</p>
+        <div className="mb-5">
+          <p className="mb-2 text-xs text-gray-400">Stake Amount</p>
           <div className="grid grid-cols-3 gap-2">
             {STAKE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setSelectedStake(opt.value)}
-                className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                className={`rounded-xl border px-3 py-3 text-sm font-medium transition-all active:scale-95 ${
                   selectedStake === opt.value
                     ? 'border-accent bg-accent/20 text-accent-light'
-                    : 'border-gray-700 bg-surface-light text-gray-300 hover:border-accent/50'
+                    : 'border-gray-700 bg-surface-light text-gray-300'
                 }`}
               >
                 {opt.label}
@@ -62,17 +62,17 @@ export default function StakeModal({
         </div>
 
         {/* Duration Selection */}
-        <div className="mb-8">
-          <p className="mb-3 text-sm text-gray-400">Game Duration</p>
+        <div className="mb-6">
+          <p className="mb-2 text-xs text-gray-400">Game Duration</p>
           <div className="grid grid-cols-2 gap-2">
             {DURATION_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setSelectedDuration(opt.value)}
-                className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                className={`rounded-xl border px-3 py-3 text-sm font-medium transition-all active:scale-95 ${
                   selectedDuration === opt.value
                     ? 'border-accent bg-accent/20 text-accent-light'
-                    : 'border-gray-700 bg-surface-light text-gray-300 hover:border-accent/50'
+                    : 'border-gray-700 bg-surface-light text-gray-300'
                 }`}
               >
                 {opt.label}
@@ -86,7 +86,7 @@ export default function StakeModal({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 rounded-lg border border-gray-700 py-3 text-sm text-gray-400 transition-colors hover:border-gray-500"
+            className="flex-1 rounded-xl border border-gray-700 py-3 text-sm text-gray-400 transition-colors active:bg-gray-800"
           >
             Cancel
           </button>
@@ -96,7 +96,7 @@ export default function StakeModal({
               onConfirm(selectedStake, selectedDuration);
             }}
             disabled={loading}
-            className="flex-1 rounded-lg bg-accent py-3 text-sm font-bold text-white transition-all hover:bg-accent/80 disabled:opacity-50"
+            className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Battle'}
           </button>

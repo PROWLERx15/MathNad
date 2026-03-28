@@ -26,7 +26,6 @@ function parseQuestion(q: string): {
   operator: string;
   operandB: string;
 } {
-  // Question format: "12 + 5", "15 − 8", "7 × 9", "24 ÷ 3"
   const parts = q.split(' ');
   return {
     operandA: parts[0],
@@ -99,7 +98,6 @@ export default function QuestionCard({
           }
 
           if (prevInput === answerStr) {
-            // CORRECT
             pendingCheck.current = true;
             setFeedback('correct');
             sfx.correctAnswer();
@@ -110,7 +108,6 @@ export default function QuestionCard({
               pendingCheck.current = false;
             }, 80);
           } else {
-            // WRONG
             pendingCheck.current = true;
             setFeedback('wrong');
             sfx.wrongAnswer();
@@ -189,7 +186,7 @@ export default function QuestionCard({
           };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-md mx-auto relative">
+    <div className="flex flex-col h-full w-full max-w-md mx-auto relative select-none">
       {/* Full-screen feedback flash overlay */}
       {feedback !== 'idle' && (
         <div
@@ -202,31 +199,31 @@ export default function QuestionCard({
       )}
 
       {/* Progress badge */}
-      <div className="flex items-center justify-center pt-4 pb-2">
-        <span className="rounded bg-accent/20 px-3 py-1 text-sm text-accent font-bold">
+      <div className="flex items-center justify-center pt-6 pb-2">
+        <span className="rounded-full bg-accent/20 px-4 py-1.5 text-xs text-accent font-bold">
           Q {questionIndex + 1}/{totalQuestions}
         </span>
       </div>
 
-      {/* Arena main canvas */}
-      <main className="flex-grow flex flex-col items-center justify-center px-6">
+      {/* Arena main canvas — no input elements, only visual display */}
+      <main className="flex-grow flex flex-col items-center justify-center px-5">
         {/* The Monolith Expression */}
         <div
-          className={`text-center border-2 ${feedbackStyles.border} ${feedbackStyles.glow} rounded-xl p-6 transition-all duration-100`}
+          className={`text-center border-2 ${feedbackStyles.border} ${feedbackStyles.glow} rounded-2xl p-5 transition-all duration-100 w-full`}
         >
-          <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-none">
+          <h1 className="text-5xl font-black text-white tracking-tighter leading-none">
             {operandA}{' '}
-            <span className="text-accent mx-2">{operator}</span>{' '}
+            <span className="text-accent mx-1">{operator}</span>{' '}
             {operandB}
           </h1>
 
-          {/* Answer Input Cells with shake */}
+          {/* Answer Input Cells — purely visual, no <input> elements */}
           <motion.div
             key={shakeKey}
             variants={shakeVariants}
             initial="idle"
             animate={feedback === 'wrong' ? 'shake' : 'idle'}
-            className="mt-8 flex justify-center gap-2"
+            className="mt-6 flex justify-center gap-2"
           >
             {inputCells.map((char, i) => {
               const isFilled = char !== null;
@@ -245,9 +242,9 @@ export default function QuestionCard({
               return (
                 <div
                   key={i}
-                  className={`w-12 h-16 border-b-4 ${cellBorder} bg-[#1c162d]/50 flex items-center justify-center transition-colors duration-100`}
+                  className={`w-11 h-14 border-b-4 ${cellBorder} bg-[#1c162d]/50 flex items-center justify-center transition-colors duration-100`}
                 >
-                  <span className="text-4xl font-mono font-bold text-white">
+                  <span className="text-3xl font-mono font-bold text-white">
                     {isFilled ? char : isActive ? '_' : ''}
                   </span>
                 </div>
@@ -257,7 +254,7 @@ export default function QuestionCard({
         </div>
       </main>
 
-      {/* Numeric Keypad */}
+      {/* On-screen numeric keypad — the ONLY way to input answers */}
       <Keypad
         onDigit={handleDigit}
         onBackspace={handleBackspace}

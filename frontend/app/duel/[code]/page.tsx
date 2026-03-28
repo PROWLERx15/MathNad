@@ -33,7 +33,7 @@ export default function DuelLobbyPage() {
     })
   );
 
-  // Poll for on-chain duel ID (handles case where createDuel tx hasn't confirmed yet)
+  // Poll for on-chain duel ID
   useEffect(() => {
     let cancelled = false;
 
@@ -58,7 +58,6 @@ export default function DuelLobbyPage() {
       }
     }
 
-    // Try immediately, then poll every 3s if not found
     pollForDuelId();
     pollRef.current = setInterval(pollForDuelId, 3000);
 
@@ -68,7 +67,7 @@ export default function DuelLobbyPage() {
     };
   }, [code]);
 
-  // Join WS lobby once we have duelId, address, and connection
+  // Join WS lobby
   useEffect(() => {
     if (connected && duelId && address && !joinedRef.current) {
       joinedRef.current = true;
@@ -111,35 +110,35 @@ export default function DuelLobbyPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
-      <div className="w-full max-w-md text-center">
-        <h1 className="mb-8 text-2xl font-bold text-white">Battle Lobby</h1>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-5 py-8">
+      <div className="w-full max-w-sm text-center">
+        <h1 className="mb-6 text-xl font-bold text-white">Battle Lobby</h1>
 
-        <div className="mb-8">
-          <p className="mb-3 text-sm text-gray-400">Share this code</p>
+        <div className="mb-6">
+          <p className="mb-2 text-xs text-gray-400">Share this code</p>
           <div
             onClick={copyCode}
-            className="pulse-glow inline-block cursor-pointer rounded-2xl border border-accent/30 bg-surface px-8 py-6"
+            className="pulse-glow inline-block cursor-pointer rounded-2xl border border-accent/30 bg-surface px-6 py-5 active:scale-95 transition-transform"
           >
-            <p className="font-mono text-5xl font-black tracking-[0.3em] text-accent">
+            <p className="font-mono text-4xl font-black tracking-[0.3em] text-accent">
               {code}
             </p>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            {copied ? 'Copied!' : 'Click to copy'}
+          <p className="mt-2 text-[10px] text-gray-500">
+            {copied ? '✓ Copied!' : 'Tap to copy'}
           </p>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-surface p-6">
+        <div className="rounded-2xl border border-gray-800 bg-surface p-5">
           {lobbyState === 'waiting' && (
             <div>
               <div className="mb-3 flex justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
               </div>
-              <p className="text-gray-300">
+              <p className="text-sm text-gray-300">
                 {duelId ? 'Waiting for opponent...' : 'Confirming on-chain...'}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-gray-500">
                 {duelId
                   ? 'Share the code above to invite someone'
                   : 'Waiting for transaction to confirm'}
@@ -149,16 +148,16 @@ export default function DuelLobbyPage() {
 
           {lobbyState === 'seeding' && (
             <div>
-              <p className="mb-2 text-lg text-green-400">
-                Opponent found! &#9989;
+              <p className="mb-2 text-base text-green-400">
+                Opponent found! ✅
               </p>
               <div className="flex items-center justify-center gap-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                <p className="text-gray-300">
-                  Generating seed... &#127922;
+                <p className="text-sm text-gray-300">
+                  Generating seed... 🎲
                 </p>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-gray-500">
                 Pyth Entropy callback in progress
               </p>
             </div>
@@ -166,12 +165,12 @@ export default function DuelLobbyPage() {
 
           {lobbyState === 'ready' && (
             <div>
-              <p className="mb-2 text-lg text-green-400">
-                Seed ready! &#9989;
+              <p className="mb-2 text-base text-green-400">
+                Seed ready! ✅
               </p>
               <div className="flex items-center justify-center gap-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                <p className="text-gray-300">Starting game...</p>
+                <p className="text-sm text-gray-300">Starting game...</p>
               </div>
             </div>
           )}
@@ -179,9 +178,9 @@ export default function DuelLobbyPage() {
 
         <button
           onClick={() => router.push('/')}
-          className="mt-8 text-sm text-gray-500 hover:text-gray-300"
+          className="mt-6 text-xs text-gray-500 active:text-gray-300"
         >
-          &larr; Back to Home
+          ← Back to Home
         </button>
       </div>
     </div>

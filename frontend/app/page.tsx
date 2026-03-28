@@ -87,13 +87,16 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen flex-col items-center justify-between bg-background px-5 py-8">
+      {/* Top spacer for visual balance */}
+      <div className="flex-1" />
+
       {/* Header */}
-      <div className="mb-12 text-center">
-        <h1 className="mb-2 text-5xl font-black tracking-tight text-white md:text-7xl">
+      <div className="mb-10 text-center">
+        <h1 className="mb-2 text-4xl font-black tracking-tight text-white">
           Math<span className="text-accent">Nad</span>
         </h1>
-        <p className="text-lg text-gray-400">
+        <p className="text-sm text-gray-400">
           PvP Math Battles on Monad
         </p>
       </div>
@@ -101,12 +104,12 @@ export default function Home() {
       {!isConnected ? (
         <button
           onClick={login}
-          className="rounded-xl bg-accent px-8 py-4 text-lg font-bold text-white shadow-lg shadow-accent/30 transition-all hover:bg-accent/80 hover:shadow-accent/50"
+          className="w-full max-w-xs rounded-2xl bg-accent px-8 py-4 text-lg font-bold text-white shadow-lg shadow-accent/30 transition-all active:scale-95"
         >
           Sign in with Google
         </button>
       ) : (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-sm space-y-5">
           {/* Wallet Info */}
           <div className="flex items-center justify-between rounded-xl border border-gray-800 bg-surface px-4 py-3">
             <div className="text-sm">
@@ -119,7 +122,7 @@ export default function Home() {
             </div>
             <button
               onClick={logout}
-              className="text-xs text-gray-500 hover:text-gray-300"
+              className="text-xs text-gray-500 active:text-gray-300"
             >
               Logout
             </button>
@@ -128,21 +131,21 @@ export default function Home() {
           {/* Create Battle */}
           <button
             onClick={() => setShowStakeModal(true)}
-            className="pulse-glow w-full rounded-2xl border border-accent/30 bg-surface p-6 text-left transition-all hover:border-accent/60"
+            className="pulse-glow w-full rounded-2xl border border-accent/30 bg-surface p-5 text-left transition-all active:scale-[0.98]"
           >
-            <div className="mb-2 text-3xl">&#9876;&#65039;</div>
-            <h2 className="mb-1 text-xl font-bold text-white">
+            <div className="mb-2 text-2xl">⚔️</div>
+            <h2 className="mb-1 text-lg font-bold text-white">
               Create Battle
             </h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-xs text-gray-400">
               Set your stakes and challenge an opponent
             </p>
           </button>
 
           {/* Join Battle */}
-          <div className="rounded-2xl border border-gray-800 bg-surface p-6">
-            <div className="mb-2 text-3xl">&#128279;</div>
-            <h2 className="mb-3 text-xl font-bold text-white">Join Battle</h2>
+          <div className="rounded-2xl border border-gray-800 bg-surface p-5">
+            <div className="mb-2 text-2xl">🔗</div>
+            <h2 className="mb-3 text-lg font-bold text-white">Join Battle</h2>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -150,14 +153,14 @@ export default function Home() {
                 onChange={(e) =>
                   setJoinCode(e.target.value.toUpperCase().slice(0, 6))
                 }
-                placeholder="Enter 6-char code"
+                placeholder="6-char code"
                 maxLength={6}
-                className="flex-1 rounded-lg border border-gray-700 bg-surface-light px-4 py-3 font-mono text-center text-lg tracking-widest text-white outline-none transition-all focus:border-accent"
+                className="flex-1 rounded-xl border border-gray-700 bg-surface-light px-4 py-3 font-mono text-center text-base tracking-widest text-white outline-none transition-all focus:border-accent"
               />
               <button
                 onClick={handleJoin}
                 disabled={joining || joinCode.length < 4}
-                className="rounded-lg bg-accent px-6 py-3 font-bold text-white transition-all hover:bg-accent/80 disabled:opacity-50"
+                className="rounded-xl bg-accent px-5 py-3 font-bold text-white transition-all active:scale-95 disabled:opacity-50"
               >
                 {joining ? '...' : 'Join'}
               </button>
@@ -166,16 +169,17 @@ export default function Home() {
 
           {/* Error */}
           {error && (
-            <div className="rounded-lg bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
+            <div className="rounded-xl bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
               {error}
             </div>
           )}
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-16 text-center text-xs text-gray-600">
-        Powered by Monad &middot; Pyth Entropy VRF &middot; USDC Stakes
+      {/* Bottom spacer + Footer */}
+      <div className="flex-1" />
+      <div className="mt-8 text-center text-[10px] text-gray-600">
+        Powered by Monad · Pyth Entropy VRF · USDC Stakes
       </div>
 
       {/* Stake Modal */}
